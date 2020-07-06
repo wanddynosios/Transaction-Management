@@ -12,12 +12,15 @@ import discreteEventSimulation.event.LogTime;
 
 public class SchedularTest {
 
-	// 2c,3a,3b
+	// 2c,3a,3b,3c
 	@Test
 	public void runScheduler() {
 		Scheduler scheduler = new Scheduler();
 		try {
-			scheduler.start(Arrays.asList(new CreateNewEvent(0, scheduler), new Cancel(1000000, scheduler)));
+			long stopTime = 1000000;
+			System.out.println("Events: Expect ~ " + stopTime / CreateNewEvent.getMean() + ", actual: " + scheduler
+					.start(Arrays.asList(new CreateNewEvent(0, scheduler), new Cancel(stopTime, scheduler))));
+			;
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Scheduler had some error while running!");
@@ -29,13 +32,13 @@ public class SchedularTest {
 	public void priority() {
 		Scheduler scheduler = new Scheduler();
 		try {
-			scheduler.start(Arrays.asList(new LogTime(2, scheduler),new LogTime(0, scheduler)));
+			scheduler.start(Arrays.asList(new LogTime(2, scheduler), new LogTime(0, scheduler)));
 			System.out.print("\n");
-			scheduler.start(Arrays.asList(new LogTime(0, scheduler),new LogTime(2, scheduler)));
+			scheduler.start(Arrays.asList(new LogTime(0, scheduler), new LogTime(2, scheduler)));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Scheduler had some error while running!");
 		}
 	}
-	
+
 }

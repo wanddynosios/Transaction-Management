@@ -18,10 +18,13 @@ public class Scheduler {
 	 * Represents the events to be executed. Priority: Event with lowest time
 	 */
 	private PriorityQueue<Event> eventQueue;
-
+	
+	private Integer exeutedEvents;
+	
 	public Scheduler()  {
 		this.eventQueue = new PriorityQueue<Event>((a, b) -> a.getTimestamp() > b.getTimestamp() ? 1 : -1);
 		this.time = 0;
+		this.exeutedEvents = 0;
 	}
 	
 	
@@ -32,14 +35,16 @@ public class Scheduler {
 	 * @param startEvents
 	 * @throws Exception 
 	 */
-	public void start(List<Event> startEvents) throws Exception {	
+	public Integer start(List<Event> startEvents) throws Exception {	
 		this.addStartEvents(startEvents);
 		Event currentEvent;
 		while (!this.eventQueue.isEmpty()) {
 			currentEvent = this.eventQueue.remove();
 			this.time = currentEvent.getTimestamp();
 			currentEvent.execute();
+			this.exeutedEvents++;
 		}
+		return this.exeutedEvents;
 	}
 	
 	private void addStartEvents(List<Event> startEvents) throws Exception {
