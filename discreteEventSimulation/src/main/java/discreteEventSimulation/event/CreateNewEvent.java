@@ -5,15 +5,15 @@ import lombok.NoArgsConstructor;
 
 // 2b
 @NoArgsConstructor
-public class CreateNewEventEvent extends Event {
+public class CreateNewEvent extends Event {
 	
-	public CreateNewEventEvent(long timestamp, Scheduler scheduler) {
+	public CreateNewEvent(long timestamp, Scheduler scheduler) {
 		super(timestamp, scheduler);
 	}
 	
 	@Override
 	public void execute() throws Exception {
 		System.out.println(super.scheduler.getTime());
-		super.scheduler.addEvent(new CreateNewEventEvent(), 10);
+		super.scheduler.addEvent(new CreateNewEvent(), 10);
 	}
 }
