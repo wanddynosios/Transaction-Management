@@ -3,6 +3,8 @@ package discreteEventSimulation.simulator;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import org.apache.commons.math3.distribution.RealDistribution;
+
 import discreteEventSimulation.event.Event;
 import lombok.Getter;
 import lombok.ToString;
@@ -19,10 +21,14 @@ public class Scheduler {
 	 */
 	private PriorityQueue<Event> eventQueue;
 	
+	@Getter
+	private  RealDistribution distribution;
+	
 	private Integer exeutedEvents;
 	
-	public Scheduler()  {
+	public Scheduler(RealDistribution distribution)  {
 		this.eventQueue = new PriorityQueue<Event>((a, b) -> a.getTimestamp() > b.getTimestamp() ? 1 : -1);
+		this.distribution = distribution;
 		this.time = 0;
 		this.exeutedEvents = 0;
 	}
