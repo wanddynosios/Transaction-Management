@@ -6,17 +6,18 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
+import discreteEventSimulation.event.Cancel;
 import discreteEventSimulation.event.CreateNewEvent;
 import discreteEventSimulation.event.LogTime;
 
 public class SchedularTest {
 
-	// 2c
+	// 2c,3a,3b
 	@Test
 	public void runScheduler() {
 		Scheduler scheduler = new Scheduler();
 		try {
-			scheduler.start(Arrays.asList(new CreateNewEvent(0, scheduler)));
+			scheduler.start(Arrays.asList(new CreateNewEvent(0, scheduler), new Cancel(1000000, scheduler)));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Scheduler had some error while running!");
@@ -36,5 +37,5 @@ public class SchedularTest {
 			fail("Scheduler had some error while running!");
 		}
 	}
-
+	
 }

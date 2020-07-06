@@ -50,16 +50,20 @@ public class Scheduler {
 		}
 		this.time = temp;
 	}
+	
+	public void stop() {
+		this.eventQueue.clear();
+	}
 
 	/**
-	 * Adds an event. The time of the event must be in future of the time of
+	 * Adds an event. The time of the event must not be in the past of the time of
 	 * this scheduler. Sets the the referenced scheduler of the event to this scheduler.
 	 * 
 	 * @param event
 	 * @throws Exception
 	 */
 	public void addEvent(Event event) throws Exception {
-		if (event.getTimestamp() <= this.time)
+		if (event.getTimestamp() < this.time)
 			throw new Exception("Time of event must not be in the past! Scheduler time: " + this.time
 					+ ", Event time : " + event.getTimestamp() + ", Event : " + event);
 		event.setScheduler(this);
@@ -72,11 +76,11 @@ public class Scheduler {
 	 * @param event
 	 * @param time  in future, e.g.: scheduler time = 10, time = 5 -> event time =
 	 *              15
-	 * @throws Exception if time value passed is not positive
+	 * @throws Exception if time value passed is negative
 	 */
 	public void addEvent(Event event, long time) throws Exception {
-		if (time <= 0)
-			throw new Exception("Time has to be > 0 ! Passed : " + time);
+		if (time < 0)
+			throw new Exception("Time has to be >= 0 ! Passed : " + time);
 		event.setTimestamp(this.time + time);
 		event.setScheduler(this);
 		this.eventQueue.add(event);

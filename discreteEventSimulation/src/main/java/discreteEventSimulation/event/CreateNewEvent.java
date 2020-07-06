@@ -1,19 +1,28 @@
 package discreteEventSimulation.event;
 
+import java.util.Random;
+
+import org.apache.commons.math3.distribution.ExponentialDistribution;
+import org.apache.commons.math3.random.RandomGeneratorFactory;
+
 import discreteEventSimulation.simulator.Scheduler;
 import lombok.NoArgsConstructor;
 
 // 2b
 @NoArgsConstructor
 public class CreateNewEvent extends Event {
-	
+
+	public static Integer mean = 10;
+	public static ExponentialDistribution exp = new ExponentialDistribution(
+			RandomGeneratorFactory.createRandomGenerator(new Random()), mean);
+
 	public CreateNewEvent(long timestamp, Scheduler scheduler) {
 		super(timestamp, scheduler);
 	}
-	
+
 	@Override
 	public void execute() throws Exception {
 		System.out.println(super.scheduler.getTime());
-		super.scheduler.addEvent(new CreateNewEvent(), 10);
+		super.scheduler.addEvent(new CreateNewEvent(), (long) exp.sample());
 	}
 }
