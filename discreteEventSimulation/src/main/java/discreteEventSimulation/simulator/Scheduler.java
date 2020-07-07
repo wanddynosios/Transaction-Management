@@ -20,28 +20,26 @@ public class Scheduler {
 	 * Represents the events to be executed. Priority: Event with lowest time
 	 */
 	private PriorityQueue<Event> eventQueue;
-	
+
 	@Getter
-	private  RealDistribution distribution;
-	
+	private RealDistribution distribution;
+
 	private Integer exeutedEvents;
-	
-	public Scheduler(RealDistribution distribution)  {
+
+	public Scheduler(RealDistribution distribution) {
 		this.eventQueue = new PriorityQueue<Event>((a, b) -> a.getTimestamp() > b.getTimestamp() ? 1 : -1);
 		this.distribution = distribution;
 		this.time = 0;
 		this.exeutedEvents = 0;
 	}
-	
-	
 
 	/**
 	 * Starts scheduler -> executes events in this event queue
 	 * 
 	 * @param startEvents
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	public Integer start(List<Event> startEvents) throws Exception {	
+	public Integer start(List<Event> startEvents) throws Exception {
 		this.addStartEvents(startEvents);
 		Event currentEvent;
 		while (!this.eventQueue.isEmpty()) {
@@ -52,7 +50,7 @@ public class Scheduler {
 		}
 		return this.exeutedEvents;
 	}
-	
+
 	private void addStartEvents(List<Event> startEvents) throws Exception {
 		long temp = this.time;
 		this.time = -1;
@@ -61,14 +59,15 @@ public class Scheduler {
 		}
 		this.time = temp;
 	}
-	
+
 	public void stop() {
 		this.eventQueue.clear();
 	}
 
 	/**
 	 * Adds an event. The time of the event must not be in the past of the time of
-	 * this scheduler. Sets the the referenced scheduler of the event to this scheduler.
+	 * this scheduler. Sets the the referenced scheduler of the event to this
+	 * scheduler.
 	 * 
 	 * @param event
 	 * @throws Exception
@@ -82,7 +81,8 @@ public class Scheduler {
 	}
 
 	/**
-	 * Adds an event. Sets the the referenced scheduler of the event to this scheduler.
+	 * Adds an event. Sets the the referenced scheduler of the event to this
+	 * scheduler.
 	 * 
 	 * @param event
 	 * @param time  in future, e.g.: scheduler time = 10, time = 5 -> event time =
