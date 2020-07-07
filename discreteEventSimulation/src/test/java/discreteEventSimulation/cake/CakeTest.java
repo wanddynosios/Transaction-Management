@@ -30,13 +30,16 @@ public class CakeTest {
 	@Test
 	public void multiSimulation() {
 		Cake.setLog(false);
-		Integer numberOfCakes = 15;
-		for (int i = 1; i <= 3; i++) {
-			this.multiSimulationHelper((int) Math.pow(10, i), numberOfCakes);
+		Integer numberOfCakes = 15, base = 10, maxExponent = 4;
+		double totalSd = 0;
+
+		for (int i = 1; i <= maxExponent; i++) {
+			totalSd += this.multiSimulationHelper((int) Math.pow(base, i), numberOfCakes);
 		}
+		System.out.println("Average standard deviation: " + totalSd / maxExponent);
 	}
 
-	private void multiSimulationHelper(Integer numberOfSimulations, Integer numberOfCakes) {
+	private double multiSimulationHelper(Integer numberOfSimulations, Integer numberOfCakes) {
 
 		long[] times = new long[numberOfSimulations];
 
@@ -63,6 +66,7 @@ public class CakeTest {
 
 		System.out.println("Simulations: " + numberOfSimulations + ", Average time for baking " + numberOfCakes
 				+ " cakes: " + average + " -> Standard deviation " + sd);
+		return sd;
 	}
 
 	private long bakeCakes(Integer numberOfCakes) throws Exception {
