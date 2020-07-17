@@ -27,11 +27,8 @@ public class Crossing {
 		for (int i = currentLight; i < numberOfLights; i++) {
 			TrafficLight newLight = new TrafficLight(this, this.greenPhaseTime, this.carLeavingTime, i);
 			this.trafficLights.put(i, newLight);
-			if (i % 2 == 0) {
-				DESScheduler.scheduleToFuture(new ModelProcess(new CarArrival(newLight, 20)), 0);
-			} else {
-				DESScheduler.scheduleToFuture(new ModelProcess(new CarArrival(newLight, 10)), 0);
-			}
+			DESScheduler.scheduleToFuture(new ModelProcess(new CarArrival(newLight, greenPhaseTime / carLeavingTime)),
+					0);
 		}
 	}
 

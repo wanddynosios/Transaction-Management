@@ -1,40 +1,55 @@
 package de.fhdw.tm.trafficlight;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
+
 import de.fhdw.tm.des.modelling.ModelProcess;
 import de.fhdw.tm.des.scheduler.DESScheduler;
 import de.fhdw.tm.des.scheduler.Simulation;
 import de.fhdw.tm.des.scheduler.Simulator;
 
 public class CrossingSimulation {
-	public static void main(String[] args) {
 
-		DESScheduler.setDebug(true);
+	@Test
+	public void simulate() {
+		try {
+			this.simulate(false, 0, 1, 1, 1000, 4, 20, 5, 2);
+		} catch (InterruptedException e) {
+			fail(e.getCause());
+		}
+	}
 
-		Simulator simulator = new Simulator();
+	private void simulate(boolean debug, long seed, Integer simulations, Integer threads, Integer terminationTime,
+			Integer numberOfLights, Integer greenPhaseTime, Integer redPhaseTime, Integer carLeavingTime)
+			throws InterruptedException {
+
+		DESScheduler.setDebug(debug);
+
+		Simulator simulator = new Simulator(seed, threads);
 
 		Simulation sim = new Simulation() {
 
 			@Override
 			public void start() {
-				System.out.println("Start!");
 			}
 
 			@Override
 			public void injectStart() {
-				DESScheduler.scheduleToFuture(new ModelProcess(new Crossing(4, 20, 5, 2)), 0);
-				DESScheduler.scheduleToFuture(() -> DESScheduler.terminate(), 1000);
+				DESScheduler.scheduleToFuture(
+						new ModelProcess(new Crossing(numberOfLights, greenPhaseTime, redPhaseTime, carLeavingTime)),
+						0);
+				DESScheduler.scheduleToFuture(() -> DESScheduler.terminate(), terminationTime);
 			}
 
 			@Override
 			public void finish() {
-				System.out.println("End!");
 			}
 		};
 
-		for (int i = 0; i < 1; i++) {
-			simulator.simulate(sim);
-		}
-		simulator.terminate();
+		simulator.simulate(sim, simulations);
 
+		simulator.terminate();
+		simulator.awaitTermination();
 	}
 }
