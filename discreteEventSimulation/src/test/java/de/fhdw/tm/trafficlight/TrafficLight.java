@@ -9,7 +9,7 @@ public class TrafficLight {
 
 	private Integer waitingCars;
 	private Integer carLeavingTime;
-	long timeleft;
+	private long timeleft;
 	private Integer id;
 	private Crossing crossing;
 
@@ -19,6 +19,18 @@ public class TrafficLight {
 		this.waitingCars = 0;
 		this.timeleft = timeleft;
 		this.carLeavingTime = carLeavingTime;
+	}
+
+	public void prepareGreenPhase(Integer timeleft) {
+		this.timeleft = timeleft;
+	}
+
+	public void prepareGreenPhase(Integer timeleft, Integer slowStart) {
+		this.timeleft = timeleft;
+		if (this.waitingCars > 0) {
+			this.waitingCars--;
+			this.timeleft = Math.max(this.timeleft - slowStart, 0);
+		}
 	}
 
 	public void carArrives() {
@@ -45,5 +57,4 @@ public class TrafficLight {
 	public String toString() {
 		return "Light = " + this.id + ", waiting cars = " + this.waitingCars + ", time left = " + this.timeleft;
 	}
-
 }
