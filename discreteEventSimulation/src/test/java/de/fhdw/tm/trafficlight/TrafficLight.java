@@ -32,6 +32,7 @@ public class TrafficLight {
 			this.timeleft = Math.max(this.timeleft - slowStart, 0);
 		}
 	}
+	
 
 	public void carArrives() {
 		this.waitingCars++;
@@ -39,7 +40,7 @@ public class TrafficLight {
 
 	@ProcessStepDelay(0)
 	public long carLeavesDelay() {
-		return 0;
+		return 0; // doesnt get called -> see modelprocess -> either as second step or schedule to future
 	}
 
 	@ProcessStep(0)

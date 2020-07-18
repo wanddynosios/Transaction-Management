@@ -13,7 +13,8 @@ import de.fhdw.tm.des.scheduler.DESScheduler;
 public class Crossing {
 
 	private Map<Integer, TrafficLight> trafficLights;
-	private Integer currentLight;
+	private Integer currentLightId;
+	private TrafficLight currentTrafficLight;
 	private Integer greenPhaseTime;
 	private Integer redPhaseTime;
 	private Integer carLeavingTime;
@@ -28,37 +29,49 @@ public class Crossing {
 		this.greenPhaseTime = greenPhaseTime;
 		this.redPhaseTime = redPhaseTime;
 		this.carLeavingTime = carLeavingTime;
-		this.currentLight = 0;
+		this.currentLightId = 0;
 		this.numberOfLights = numberOfLights;
 		this.trafficLights = new HashMap<Integer, TrafficLight>();
-		for (int i = currentLight; i < numberOfLights; i++) {
+		for (int i = currentLightId; i < numberOfLights; i++) {
 			TrafficLight newLight = new TrafficLight(this, this.greenPhaseTime, this.carLeavingTime, i);
 			this.trafficLights.put(i, newLight);
 			DESScheduler.scheduleToFuture(new ModelProcess(new CarArrival(newLight, greenPhaseTime / carLeavingTime)),
 					0);
 		}
+		this.currentTrafficLight = this.trafficLights.get(this.currentLightId);
 	}
 
 	@ProcessStepDelay(0)
 	public long redPhase() {
-		return this.redPhaseTime;
+		return 0; // doesnt get called -> see modelprocess -> either as second step or schedule to
+		// future with redtime
 	}
 
 	@ProcessStep(0)
 	public void greenPhase() {
-		TrafficLight currentTrafficLight = this.trafficLights.get(this.currentLight);
+
+		// preparation of current traffic light
 		if (slowStart)
-			currentTrafficLight.prepareGreenPhase(this.greenPhaseTime, (int) this.slowStartDistribution.sample());
+			this.currentTrafficLight.prepareGreenPhase(this.greenPhaseTime, (int) this.slowStartDistribution.sample());
 		else
-			currentTrafficLight.prepareGreenPhase(this.greenPhaseTime);
-		DESScheduler.log("Start Green Phase: " + currentTrafficLight.toString());
-		DESScheduler.scheduleToFuture(new ModelProcess(currentTrafficLight), 0);
+			this.currentTrafficLight.prepareGreenPhase(this.greenPhaseTime);
+
+		DESScheduler.log(
+				"Current Time = " + DESScheduler.getSimulationTime() + " -> " + this.currentTrafficLight.toString());
+
+		// schedule current light -> delay represents red phase
+		DESScheduler.scheduleToFuture(new ModelProcess(this.currentTrafficLight), this.redPhaseTime);
 	}
 
 	public void nextLight() {
-		TrafficLight currentTrafficLight = this.trafficLights.get(this.currentLight);
-		DESScheduler.log("End Green Phase: " + currentTrafficLight.toString());
-		this.currentLight = ++this.currentLight % numberOfLights;
+		DESScheduler.log(
+				"Current Time = " + DESScheduler.getSimulationTime() + " -> " + this.currentTrafficLight.toString());
+
+		// set new id and traffic light object
+		this.currentTrafficLight = this.trafficLights
+				.get((this.currentLightId = ++this.currentLightId % numberOfLights));
+
+		// reschedule this -> next light becomes green
 		DESScheduler.scheduleToFuture(new ModelProcess(this), 0);
 	}
 }

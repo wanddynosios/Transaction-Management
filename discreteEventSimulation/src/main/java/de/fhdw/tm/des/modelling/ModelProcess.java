@@ -17,16 +17,7 @@ public class ModelProcess implements DESOperation {
 		this.current = this.stepIterator.next();
 	}
 
-	public static void scheduleProcess(Object process) {
-		ModelProcess model = new ModelProcess(process);
-		DESScheduler.scheduleToFuture(model, model.getDelay());
-	}
-
-	public static void scheduleProcessToFuture(Object process, long time) {
-		ModelProcess model = new ModelProcess(process);
-		DESScheduler.scheduleToFuture(model, model.getDelay() + time);
-	}
-
+	// TODO first process step has no delay
 	@Override
 	public void process() {
 		current.process(this.targetProcess);
