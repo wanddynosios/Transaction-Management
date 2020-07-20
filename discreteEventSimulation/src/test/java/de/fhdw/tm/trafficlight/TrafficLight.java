@@ -66,7 +66,7 @@ public class TrafficLight {
 
 		this.timeleft = this.greenUntil - DESScheduler.getSimulationTime();
 
-		if (this.timeleft > 0 && !this.crossing.blocked) {
+		if (this.timeleft > 0 && this.crossing.crashes == 0) {
 
 			try {
 				Vehicle next = this.waitingVehicles.getFirst();

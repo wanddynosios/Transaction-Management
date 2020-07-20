@@ -26,7 +26,7 @@ public class Crossing {
 	private ExponentialDistribution slowStartDistribution;
 	private EvaluationInterval greenLightStats;
 	private EvaluationInterval redLightStats;
-	boolean blocked;
+	Integer crashes;
 
 	public Crossing(Integer numberOfLights, Integer greenPhaseTime, Integer redPhaseTime, Integer vehicleLeavingTime,
 			Integer vehicleArrivingMean, Integer slowStartMean, boolean slowStart, Integer chrashMean,
@@ -37,7 +37,7 @@ public class Crossing {
 		this.redPhaseTime = redPhaseTime;
 		this.currentLightId = 0;
 		this.numberOfLights = numberOfLights;
-		this.blocked = false;
+		this.crashes = 0;
 		this.trafficLights = new HashMap<Integer, TrafficLight>();
 		for (int i = currentLightId; i < numberOfLights; i++) {
 			TrafficLight newLight = new TrafficLight(i,this);
@@ -103,5 +103,13 @@ public class Crossing {
 	@Override
 	public String toString() {
 		return "number of lights = " + this.numberOfLights + ", slowstart = " + this.slowStart;
+	}
+	
+	public void crash() {
+		this.crashes++;
+	}
+	
+	public void removeCrash() {
+		this.crashes--;
 	}
 }
