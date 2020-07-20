@@ -2,6 +2,8 @@ package de.fhdw.tm.trafficlight;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.concurrent.ExecutionException;
+
 import org.junit.jupiter.api.Test;
 
 import de.fhdw.tm.des.modelling.ModelProcess;
@@ -50,5 +52,11 @@ public class CrossingSimulation {
 
 		simulator.terminate();
 		simulator.awaitTermination();
+		
+		try {
+			simulator.readResults();
+		} catch (ExecutionException e) {
+			fail(e);
+		}
 	}
 }

@@ -41,7 +41,7 @@ public class Crossing {
 
 	@ProcessStepDelay(0)
 	public long setUpDelay() {
-		return 0; // doesnt get called -> see implementation modelling
+		return 0; 
 	}
 
 	@ProcessStep(0)
