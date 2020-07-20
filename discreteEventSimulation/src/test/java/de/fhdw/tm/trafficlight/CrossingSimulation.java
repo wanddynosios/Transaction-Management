@@ -16,7 +16,7 @@ public class CrossingSimulation {
 	@Test
 	public void simulate() {
 		try {
-			this.simulate(false, 0, 1, 1, 100000, 4, 20, 5, 2, 20 + 5 / 2, 15, true, 10000, 200, true);
+			this.simulate(true, 0, 1, 1, 100000, 4, 20, 5, 2, 20 + 5 / 2, 15, true, 10000, 200, false);
 		} catch (InterruptedException e) {
 			fail(e.getCause());
 		}
@@ -43,7 +43,7 @@ public class CrossingSimulation {
 						new ModelProcess(new Crossing(numberOfLights, greenPhaseTime, redPhaseTime, vehicleLeavingTime,
 								vehicleArrivingMean, slowStartMean, slowStart, chrashMean, blockedMean, crashes)),
 						0);
-				DESScheduler.scheduleToFuture(() -> DESScheduler.terminate(), terminationTime);
+				DESScheduler.scheduleToFuture(() -> DESScheduler.terminate(), terminationTime + 1);
 			}
 
 			@Override

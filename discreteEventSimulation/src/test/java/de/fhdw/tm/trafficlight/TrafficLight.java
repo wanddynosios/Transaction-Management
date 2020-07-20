@@ -18,7 +18,6 @@ public class TrafficLight {
 	private LinkedList<Vehicle> waitingVehicles;
 	private Integer id;
 	private long greenUntil, timeleft;
-	private String start;
 	private EvaluationInterval vehicleWaiting;
 	private SimulationEvaluatorWithStore vehicleQueue;
 	private Crossing crossing;
@@ -41,13 +40,12 @@ public class TrafficLight {
 		this.vehicleQueue.addData(this.waitingVehicles.size());
 		this.greenUntil = greenUntil;
 		this.timeleft = this.greenUntil - DESScheduler.getSimulationTime();
-		this.start = this.print();
 	}
 
 	public void prepareGreenPhase(long greenUntil, Integer slowStartDelay) {
 		this.prepareGreenPhase(greenUntil);
 		if (this.waitingVehicles.size() > 0) {
-			this.waitingVehicles.getFirst().leavingTime = (int) Math.min(greenUntil - DESScheduler.getSimulationTime(),
+			this.waitingVehicles.getFirst().leavingTime = (int) Math.min(greenUntil - DESScheduler.getSimulationTime() - 1,
 					slowStartDelay);
 		}
 	}
@@ -81,9 +79,7 @@ public class TrafficLight {
 				this.passTime(1);
 			}
 
-		} else
-			DESScheduler.log(this.start + " -> " + this.print());
-
+		}
 	}
 
 	private void passTime(long time) {

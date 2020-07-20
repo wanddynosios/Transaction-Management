@@ -27,6 +27,7 @@ public class Crossing {
 	private EvaluationInterval greenLightStats;
 	private EvaluationInterval redLightStats;
 	Integer crashes;
+	private String printLight;
 
 	public Crossing(Integer numberOfLights, Integer greenPhaseTime, Integer redPhaseTime, Integer vehicleLeavingTime,
 			Integer vehicleArrivingMean, Integer slowStartMean, boolean slowStart, Integer chrashMean,
@@ -40,7 +41,7 @@ public class Crossing {
 		this.crashes = 0;
 		this.trafficLights = new HashMap<Integer, TrafficLight>();
 		for (int i = currentLightId; i < numberOfLights; i++) {
-			TrafficLight newLight = new TrafficLight(i,this);
+			TrafficLight newLight = new TrafficLight(i, this);
 			this.trafficLights.put(i, newLight);
 			DESScheduler.scheduleToFuture(
 					new ModelProcess(new VehicleArrival(newLight, vehicleArrivingMean, vehicleLeavingTime)), 0);
@@ -65,6 +66,7 @@ public class Crossing {
 
 	@ProcessStep(0)
 	public void setUp() {
+		this.printLight = "";
 		this.currentTrafficLight = this.trafficLights
 				.get((this.currentLightId = ++this.currentLightId % numberOfLights));
 	}
@@ -78,6 +80,8 @@ public class Crossing {
 		else
 			this.currentTrafficLight.prepareGreenPhase(DESScheduler.getSimulationTime() + this.greenPhaseTime);
 
+		this.printLight = this.currentTrafficLight.print();
+
 		DESScheduler.scheduleToFuture(new ModelProcess(this.currentTrafficLight), 0);
 
 		return this.greenPhaseTime;
@@ -85,6 +89,8 @@ public class Crossing {
 
 	@ProcessStep(1)
 	public void greenPhase() {
+		this.printLight += " -> " + this.currentTrafficLight.print();
+		DESScheduler.log(this.printLight);
 		this.greenLightStats.intervalStop();
 	}
 
@@ -104,11 +110,11 @@ public class Crossing {
 	public String toString() {
 		return "number of lights = " + this.numberOfLights + ", slowstart = " + this.slowStart;
 	}
-	
+
 	public void crash() {
 		this.crashes++;
 	}
-	
+
 	public void removeCrash() {
 		this.crashes--;
 	}
