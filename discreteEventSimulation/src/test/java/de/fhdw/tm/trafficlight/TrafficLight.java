@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 import de.fhdw.tm.des.evaluation.EvaluationInterval;
+import de.fhdw.tm.des.evaluation.SimulationEvaluatorWithStore;
 import de.fhdw.tm.des.evaluation.aggregation.CountCharacteristic;
 import de.fhdw.tm.des.evaluation.aggregation.MeanCharacteristic;
 import de.fhdw.tm.des.evaluation.aggregation.StandardDeviationCharacteristic;
@@ -19,16 +20,23 @@ public class TrafficLight {
 	private long greenUntil, timeleft;
 	private String start;
 	private EvaluationInterval vehicleWaiting;
+	private SimulationEvaluatorWithStore vehicleQueue;
 
 	public TrafficLight(Integer id) {
 		this.waitingVehicles = new LinkedList<Vehicle>();
 		this.id = id;
+		
 		this.vehicleWaiting = new EvaluationInterval("Vehicle waiting", this, new MeanCharacteristic(),
 				new CountCharacteristic(), new StandardDeviationCharacteristic());
 		this.vehicleWaiting.intervalStart();
+		
+		this.vehicleQueue = new SimulationEvaluatorWithStore("Light " + this.id+" -> Vehicle queue", new Object(), new MeanCharacteristic(),
+				new CountCharacteristic(), new StandardDeviationCharacteristic()) {
+		};
 	}
 
 	public void prepareGreenPhase(long greenUntil) {
+		this.vehicleQueue.addData(this.waitingVehicles.size());
 		this.greenUntil = greenUntil;
 		this.timeleft = this.greenUntil - DESScheduler.getSimulationTime();
 		this.start = this.print();
@@ -75,7 +83,7 @@ public class TrafficLight {
 		return DESScheduler.getSimulationTime() + ": " + "Light = " + this.id + ", waiting cars = "
 				+ this.waitingVehicles.size();
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.id.toString();
