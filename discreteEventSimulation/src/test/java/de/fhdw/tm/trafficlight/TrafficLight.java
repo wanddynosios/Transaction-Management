@@ -12,7 +12,7 @@ public class TrafficLight {
 
 	private LinkedList<Vehicle> waitingVehicles;
 	private Integer id;
-	private long greenUntil,timeleft;
+	private long greenUntil, timeleft;
 
 	public TrafficLight(Integer id) {
 		this.waitingVehicles = new LinkedList<Vehicle>();
@@ -25,14 +25,11 @@ public class TrafficLight {
 		DESScheduler.log(this.toString());
 	}
 
-	public void prepareGreenPhase(long greenUntil, Integer slowStartDelay) throws Exception {
-		if (slowStartDelay > greenUntil - DESScheduler.getSimulationTime())
-			throw new Exception("Deadlock -> Car can never leave because leaving time is higher than greentime: "
-					+ greenUntil + " < " + slowStartDelay);
+	public void prepareGreenPhase(long greenUntil, Integer slowStartDelay) {
 		this.prepareGreenPhase(greenUntil);
-
 		if (this.waitingVehicles.size() > 0) {
-			this.waitingVehicles.getFirst().leavingTime = slowStartDelay;
+			this.waitingVehicles.getFirst().leavingTime = (int) Math.min(greenUntil - DESScheduler.getSimulationTime(),
+					slowStartDelay);
 		}
 	}
 
@@ -53,9 +50,11 @@ public class TrafficLight {
 				Vehicle next = this.waitingVehicles.getFirst();
 				if (next.leavingTime <= timeleft) {
 					this.waitingVehicles.removeFirst();
+					// first vehicle leaving
 					DESScheduler.scheduleToFuture(new ModelProcess(this), next.leavingTime);
 				}
 			} catch (NoSuchElementException e) {
+				// no vehicle waiting
 				DESScheduler.scheduleToFuture(new ModelProcess(this), 1);
 			}
 		} else

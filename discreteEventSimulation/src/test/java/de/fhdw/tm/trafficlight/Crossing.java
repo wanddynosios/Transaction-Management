@@ -56,7 +56,7 @@ public class Crossing {
 	}
 
 	@ProcessStep(1)
-	public void greenPhase() throws Exception {
+	public void greenPhase() {
 
 		if (slowStart)
 			this.currentTrafficLight.prepareGreenPhase(DESScheduler.getSimulationTime() + this.greenPhaseTime,
