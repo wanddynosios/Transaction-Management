@@ -13,6 +13,7 @@ public class TrafficLight {
 	private LinkedList<Vehicle> waitingVehicles;
 	private Integer id;
 	private long greenUntil, timeleft;
+	private String start;
 
 	public TrafficLight(Integer id) {
 		this.waitingVehicles = new LinkedList<Vehicle>();
@@ -22,7 +23,7 @@ public class TrafficLight {
 	public void prepareGreenPhase(long greenUntil) {
 		this.greenUntil = greenUntil;
 		this.timeleft = this.greenUntil - DESScheduler.getSimulationTime();
-		DESScheduler.log(this.toString());
+		this.start = this.toString();
 	}
 
 	public void prepareGreenPhase(long greenUntil, Integer slowStartDelay) {
@@ -58,11 +59,12 @@ public class TrafficLight {
 				DESScheduler.scheduleToFuture(new ModelProcess(this), 1);
 			}
 		} else
-			DESScheduler.log(this.toString());
+			DESScheduler.log(this.start + " -> " + this.toString());
 	}
 
 	@Override
 	public String toString() {
-		return "Light = " + this.id + ", waiting cars = " + this.waitingVehicles.size();
+		return DESScheduler.getSimulationTime() + ": " + "Light = " + this.id + ", waiting cars = "
+				+ this.waitingVehicles.size();
 	}
 }

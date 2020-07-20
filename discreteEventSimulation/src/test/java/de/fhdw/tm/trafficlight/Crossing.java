@@ -7,6 +7,8 @@ import org.apache.commons.math3.distribution.ExponentialDistribution;
 
 import de.fhdw.tm.des.evaluation.EvaluationInterval;
 import de.fhdw.tm.des.evaluation.aggregation.CountCharacteristic;
+import de.fhdw.tm.des.evaluation.aggregation.MeanCharacteristic;
+import de.fhdw.tm.des.evaluation.aggregation.StandardDeviationCharacteristic;
 import de.fhdw.tm.des.modelling.ModelProcess;
 import de.fhdw.tm.des.modelling.ProcessStep;
 import de.fhdw.tm.des.modelling.ProcessStepDelay;
@@ -22,8 +24,9 @@ public class Crossing {
 	private Integer numberOfLights;
 	private Boolean slowStart;
 	private ExponentialDistribution slowStartDistribution;
-	private EvaluationInterval evaluationInterval;
-
+	private EvaluationInterval greenLightStats;
+	private EvaluationInterval redLightStats;
+	
 	public Crossing(Integer numberOfLights, Integer greenPhaseTime, Integer redPhaseTime, Integer vehicleLeavingTime,
 			Integer vehicleArrivingMean, Integer slowStartMean, boolean slowStart) {
 		this.slowStartDistribution = new ExponentialDistribution(DESScheduler.getRandom(), slowStartMean);
@@ -40,32 +43,29 @@ public class Crossing {
 					new ModelProcess(new VehicleArrival(newLight, vehicleArrivingMean, vehicleLeavingTime)), 0);
 		}
 		this.currentTrafficLight = this.trafficLights.get(this.currentLightId);
-		
-		this.evaluationInterval = new EvaluationInterval("Crossing -> Light Phases", this, new CountCharacteristic());
-		this.evaluationInterval.intervalStart();
+
+		this.redLightStats = new EvaluationInterval("Red Light Phases", this, new MeanCharacteristic(),
+				new CountCharacteristic(), new StandardDeviationCharacteristic());
+
+		this.greenLightStats = new EvaluationInterval("Green Light Phases", this, new MeanCharacteristic(),
+				new CountCharacteristic(), new StandardDeviationCharacteristic());
 	}
 
 	@ProcessStepDelay(0)
 	public long setUpDelay() {
-		return 0; 
+		return 0;
 	}
 
 	@ProcessStep(0)
 	public void setUp() {
+
 		this.currentTrafficLight = this.trafficLights
 				.get((this.currentLightId = ++this.currentLightId % numberOfLights));
 	}
 
 	@ProcessStepDelay(1)
-	public long redPhase() {
-		return this.redPhaseTime;
-	}
-
-	@ProcessStep(1)
-	public void greenPhase() {
-		
-		this.evaluationInterval.trigger();
-
+	public long greenPhaseTime() {
+		this.greenLightStats.intervalStart();
 		if (slowStart)
 			this.currentTrafficLight.prepareGreenPhase(DESScheduler.getSimulationTime() + this.greenPhaseTime,
 					(int) this.slowStartDistribution.sample());
@@ -73,6 +73,29 @@ public class Crossing {
 			this.currentTrafficLight.prepareGreenPhase(DESScheduler.getSimulationTime() + this.greenPhaseTime);
 
 		DESScheduler.scheduleToFuture(new ModelProcess(this.currentTrafficLight), 0);
-		DESScheduler.scheduleToFuture(new ModelProcess(this), this.greenPhaseTime);
+
+		return this.greenPhaseTime;
+	}
+
+	@ProcessStep(1)
+	public void greenPhase() {
+		this.greenLightStats.intervalStop();
+	}
+
+	@ProcessStepDelay(2)
+	public long redPhaseTime() {
+		this.redLightStats.intervalStart();
+		return this.redPhaseTime;
+	}
+
+	@ProcessStep(2)
+	public void redPhase() {
+		this.redLightStats.intervalStop();
+		DESScheduler.scheduleToFuture(new ModelProcess(this), 0);
+	}
+
+	@Override
+	public String toString() {
+		return "number of lights = " + this.numberOfLights + ", slowstart = " + this.slowStart;
 	}
 }

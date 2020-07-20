@@ -42,7 +42,7 @@ public abstract class DESScheduler {
 
 	public static void log(String message) {
 		if (debug) {
-			System.out.println(getSimulationTime() + " -> " + message);
+			System.out.println(message);
 		}
 	}
 
