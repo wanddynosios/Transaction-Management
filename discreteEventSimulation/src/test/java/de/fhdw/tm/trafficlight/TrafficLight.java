@@ -3,6 +3,10 @@ package de.fhdw.tm.trafficlight;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
+import de.fhdw.tm.des.evaluation.EvaluationInterval;
+import de.fhdw.tm.des.evaluation.aggregation.CountCharacteristic;
+import de.fhdw.tm.des.evaluation.aggregation.MeanCharacteristic;
+import de.fhdw.tm.des.evaluation.aggregation.StandardDeviationCharacteristic;
 import de.fhdw.tm.des.modelling.ModelProcess;
 import de.fhdw.tm.des.modelling.ProcessStep;
 import de.fhdw.tm.des.modelling.ProcessStepDelay;
@@ -14,16 +18,20 @@ public class TrafficLight {
 	private Integer id;
 	private long greenUntil, timeleft;
 	private String start;
+	private EvaluationInterval vehicleWaiting;
 
 	public TrafficLight(Integer id) {
 		this.waitingVehicles = new LinkedList<Vehicle>();
 		this.id = id;
+		this.vehicleWaiting = new EvaluationInterval("Vehicle waiting", this, new MeanCharacteristic(),
+				new CountCharacteristic(), new StandardDeviationCharacteristic());
+		this.vehicleWaiting.intervalStart();
 	}
 
 	public void prepareGreenPhase(long greenUntil) {
 		this.greenUntil = greenUntil;
 		this.timeleft = this.greenUntil - DESScheduler.getSimulationTime();
-		this.start = this.toString();
+		this.start = this.print();
 	}
 
 	public void prepareGreenPhase(long greenUntil, Integer slowStartDelay) {
@@ -51,6 +59,7 @@ public class TrafficLight {
 				Vehicle next = this.waitingVehicles.getFirst();
 				if (next.leavingTime <= timeleft) {
 					this.waitingVehicles.removeFirst();
+					this.vehicleWaiting.trigger();
 					// first vehicle leaving
 					DESScheduler.scheduleToFuture(new ModelProcess(this), next.leavingTime);
 				}
@@ -59,12 +68,16 @@ public class TrafficLight {
 				DESScheduler.scheduleToFuture(new ModelProcess(this), 1);
 			}
 		} else
-			DESScheduler.log(this.start + " -> " + this.toString());
+			DESScheduler.log(this.start + " -> " + this.print());
 	}
 
-	@Override
-	public String toString() {
+	public String print() {
 		return DESScheduler.getSimulationTime() + ": " + "Light = " + this.id + ", waiting cars = "
 				+ this.waitingVehicles.size();
+	}
+	
+	@Override
+	public String toString() {
+		return this.id.toString();
 	}
 }
