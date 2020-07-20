@@ -52,9 +52,9 @@ public class CrossingSimulation {
 
 		simulator.terminate();
 		simulator.awaitTermination();
-		
+
 		try {
-			simulator.readResults();
+			simulator.readResults().forEach(result -> result.printResults());
 		} catch (ExecutionException e) {
 			fail(e);
 		}

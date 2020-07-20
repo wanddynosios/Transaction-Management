@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 
+import de.fhdw.tm.des.evaluation.EvaluationInterval;
+import de.fhdw.tm.des.evaluation.aggregation.CountCharacteristic;
 import de.fhdw.tm.des.modelling.ModelProcess;
 import de.fhdw.tm.des.modelling.ProcessStep;
 import de.fhdw.tm.des.modelling.ProcessStepDelay;
@@ -20,6 +22,7 @@ public class Crossing {
 	private Integer numberOfLights;
 	private Boolean slowStart;
 	private ExponentialDistribution slowStartDistribution;
+	private EvaluationInterval evaluationInterval;
 
 	public Crossing(Integer numberOfLights, Integer greenPhaseTime, Integer redPhaseTime, Integer vehicleLeavingTime,
 			Integer vehicleArrivingMean, Integer slowStartMean, boolean slowStart) {
@@ -37,6 +40,9 @@ public class Crossing {
 					new ModelProcess(new VehicleArrival(newLight, vehicleArrivingMean, vehicleLeavingTime)), 0);
 		}
 		this.currentTrafficLight = this.trafficLights.get(this.currentLightId);
+		
+		this.evaluationInterval = new EvaluationInterval("Crossing -> Light Phases", this, new CountCharacteristic());
+		this.evaluationInterval.intervalStart();
 	}
 
 	@ProcessStepDelay(0)
@@ -57,6 +63,8 @@ public class Crossing {
 
 	@ProcessStep(1)
 	public void greenPhase() {
+		
+		this.evaluationInterval.trigger();
 
 		if (slowStart)
 			this.currentTrafficLight.prepareGreenPhase(DESScheduler.getSimulationTime() + this.greenPhaseTime,
