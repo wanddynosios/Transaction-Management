@@ -11,8 +11,10 @@ public class CarArrival {
 
 	private TrafficLight trafficLight;
 	private ExponentialDistribution distribution;
+	private Integer carLeavingTime;
 
-	public CarArrival(TrafficLight trafficLight, Integer mean) {
+	public CarArrival(TrafficLight trafficLight, Integer mean, Integer carLeavingTime) {
+		this.carLeavingTime = carLeavingTime;
 		this.trafficLight = trafficLight;
 		this.distribution = new ExponentialDistribution(DESScheduler.getRandom(), mean);
 	}
@@ -24,7 +26,7 @@ public class CarArrival {
 
 	@ProcessStep(0)
 	public void nextCar() {
-		this.trafficLight.carArrives();
+		this.trafficLight.vehicleArriving(new Vehicle(this.carLeavingTime));
 		DESScheduler.scheduleToFuture(new ModelProcess(this), (long) this.distribution.sample());
 	}
 }
