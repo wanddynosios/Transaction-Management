@@ -21,17 +21,19 @@ public class TrafficLight {
 	private String start;
 	private EvaluationInterval vehicleWaiting;
 	private SimulationEvaluatorWithStore vehicleQueue;
+	private Crossing crossing;
 
-	public TrafficLight(Integer id) {
+	public TrafficLight(Integer id, Crossing crossing) {
 		this.waitingVehicles = new LinkedList<Vehicle>();
 		this.id = id;
-		
+		this.crossing = crossing;
+
 		this.vehicleWaiting = new EvaluationInterval("Vehicle waiting", this, new MeanCharacteristic(),
 				new CountCharacteristic(), new StandardDeviationCharacteristic());
 		this.vehicleWaiting.intervalStart();
-		
-		this.vehicleQueue = new SimulationEvaluatorWithStore("Light " + this.id+" -> Vehicle queue", new Object(), new MeanCharacteristic(),
-				new CountCharacteristic(), new StandardDeviationCharacteristic()) {
+
+		this.vehicleQueue = new SimulationEvaluatorWithStore("Light " + this.id + " -> Vehicle queue", new Object(),
+				new MeanCharacteristic(), new CountCharacteristic(), new StandardDeviationCharacteristic()) {
 		};
 	}
 
@@ -61,22 +63,34 @@ public class TrafficLight {
 
 	@ProcessStep(0)
 	public void popVehicle() {
+
 		this.timeleft = this.greenUntil - DESScheduler.getSimulationTime();
-		if (timeleft > 0) {
-			try {
-				Vehicle next = this.waitingVehicles.getFirst();
-				if (next.leavingTime <= timeleft) {
-					this.waitingVehicles.removeFirst();
-					this.vehicleWaiting.trigger();
-					// first vehicle leaving
-					DESScheduler.scheduleToFuture(new ModelProcess(this), next.leavingTime);
+		
+		if (this.timeleft > 0) {
+
+			if (this.crossing.blocked)
+				this.passTime(1);
+			else {
+
+				try {
+					Vehicle next = this.waitingVehicles.getFirst();
+					if (next.leavingTime <= timeleft) {
+						this.waitingVehicles.removeFirst();
+						this.vehicleWaiting.trigger();
+						// first vehicle leaving
+						DESScheduler.scheduleToFuture(new ModelProcess(this), next.leavingTime);
+					}
+				} catch (NoSuchElementException e) {
+					// no vehicle waiting
+					this.passTime(1);
 				}
-			} catch (NoSuchElementException e) {
-				// no vehicle waiting
-				DESScheduler.scheduleToFuture(new ModelProcess(this), 1);
 			}
 		} else
 			DESScheduler.log(this.start + " -> " + this.print());
+	}
+
+	private void passTime(long time) {
+		DESScheduler.scheduleToFuture(new ModelProcess(this), time);
 	}
 
 	public String print() {

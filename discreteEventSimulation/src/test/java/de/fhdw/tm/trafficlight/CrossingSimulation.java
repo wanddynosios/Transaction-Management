@@ -16,7 +16,7 @@ public class CrossingSimulation {
 	@Test
 	public void simulate() {
 		try {
-			this.simulate(true, 0, 1, 1, 10000, 4, 20, 5, 2, 20 + 5 / 2, 15, false);
+			this.simulate(false, 0, 1, 1, 10000, 4, 20, 5, 2, 20 + 5 / 2, 15, false, 1000, 100, false);
 		} catch (InterruptedException e) {
 			fail(e.getCause());
 		}
@@ -24,7 +24,8 @@ public class CrossingSimulation {
 
 	private void simulate(boolean debug, long seed, Integer simulations, Integer threads, Integer terminationTime,
 			Integer numberOfLights, Integer greenPhaseTime, Integer redPhaseTime, Integer vehicleLeavingTime,
-			Integer vehicleArrivingMean, Integer slowStartMean, boolean slowStart) throws InterruptedException {
+			Integer vehicleArrivingMean, Integer slowStartMean, boolean slowStart, Integer chrashMean,
+			Integer blockedMean, boolean crashes) throws InterruptedException {
 
 		DESScheduler.setDebug(debug);
 
@@ -38,8 +39,10 @@ public class CrossingSimulation {
 
 			@Override
 			public void injectStart() {
-				DESScheduler.scheduleToFuture(new ModelProcess(new Crossing(numberOfLights, greenPhaseTime,
-						redPhaseTime, vehicleLeavingTime, vehicleArrivingMean, slowStartMean, slowStart)), 0);
+				DESScheduler.scheduleToFuture(
+						new ModelProcess(new Crossing(numberOfLights, greenPhaseTime, redPhaseTime, vehicleLeavingTime,
+								vehicleArrivingMean, slowStartMean, slowStart, chrashMean, blockedMean, crashes)),
+						0);
 				DESScheduler.scheduleToFuture(() -> DESScheduler.terminate(), terminationTime);
 			}
 
