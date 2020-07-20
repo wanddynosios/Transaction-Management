@@ -35,7 +35,7 @@ public class Crash {
 
 	@ProcessStep(1)
 	public void crash() {
-		this.crossing.block();
+		this.crossing.blocked = true;
 	}
 
 	@ProcessStepDelay(2)
@@ -45,7 +45,7 @@ public class Crash {
 
 	@ProcessStep(2)
 	public void unblock() {
-		this.crossing.unblock();
+		this.crossing.blocked = false;
 		DESScheduler.schedule(new ModelProcess(this), 0);
 	}
 }

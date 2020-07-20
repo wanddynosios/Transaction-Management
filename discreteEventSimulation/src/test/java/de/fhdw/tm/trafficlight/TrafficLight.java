@@ -65,28 +65,25 @@ public class TrafficLight {
 	public void popVehicle() {
 
 		this.timeleft = this.greenUntil - DESScheduler.getSimulationTime();
-		
-		if (this.timeleft > 0) {
 
-			if (this.crossing.blocked)
-				this.passTime(1);
-			else {
+		if (this.timeleft > 0 && !this.crossing.blocked) {
 
-				try {
-					Vehicle next = this.waitingVehicles.getFirst();
-					if (next.leavingTime <= timeleft) {
-						this.waitingVehicles.removeFirst();
-						this.vehicleWaiting.trigger();
-						// first vehicle leaving
-						DESScheduler.scheduleToFuture(new ModelProcess(this), next.leavingTime);
-					}
-				} catch (NoSuchElementException e) {
-					// no vehicle waiting
-					this.passTime(1);
+			try {
+				Vehicle next = this.waitingVehicles.getFirst();
+				if (next.leavingTime <= timeleft) {
+					this.waitingVehicles.removeFirst();
+					this.vehicleWaiting.trigger();
+					// first vehicle leaving
+					DESScheduler.scheduleToFuture(new ModelProcess(this), next.leavingTime);
 				}
+			} catch (NoSuchElementException e) {
+				// no vehicle waiting
+				this.passTime(1);
 			}
+
 		} else
 			DESScheduler.log(this.start + " -> " + this.print());
+
 	}
 
 	private void passTime(long time) {
