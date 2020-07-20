@@ -10,7 +10,6 @@ import de.fhdw.tm.des.modelling.ProcessStep;
 import de.fhdw.tm.des.modelling.ProcessStepDelay;
 import de.fhdw.tm.des.scheduler.DESScheduler;
 
-
 public class Crossing {
 
 	private Map<Integer, TrafficLight> trafficLights;
@@ -39,13 +38,12 @@ public class Crossing {
 		}
 		this.currentTrafficLight = this.trafficLights.get(this.currentLightId);
 	}
-	
-	
+
 	@ProcessStepDelay(0)
 	public long setUpDelay() {
 		return 0;
 	}
-	
+
 	@ProcessStep(0)
 	public void setUp() {
 		this.currentTrafficLight = this.trafficLights
@@ -54,18 +52,18 @@ public class Crossing {
 
 	@ProcessStepDelay(1)
 	public long redPhase() {
-		return this.redPhaseTime; 
+		return this.redPhaseTime;
 	}
 
 	@ProcessStep(1)
-	public void greenPhase() {
+	public void greenPhase() throws Exception {
 
-		this.currentTrafficLight.prepareGreenPhase(DESScheduler.getSimulationTime() + this.greenPhaseTime);
+		if (slowStart)
+			this.currentTrafficLight.prepareGreenPhase(DESScheduler.getSimulationTime() + this.greenPhaseTime,
+					(int) this.slowStartDistribution.sample());
+		else
+			this.currentTrafficLight.prepareGreenPhase(DESScheduler.getSimulationTime() + this.greenPhaseTime);
 
-		DESScheduler.log(
-				"Current Time = " + DESScheduler.getSimulationTime() + " -> " + this.currentTrafficLight.toString());
-
-		
 		DESScheduler.scheduleToFuture(new ModelProcess(this.currentTrafficLight), 0);
 		DESScheduler.scheduleToFuture(new ModelProcess(this), this.greenPhaseTime);
 	}

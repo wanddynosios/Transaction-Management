@@ -21,6 +21,18 @@ public class TrafficLight {
 
 	public void prepareGreenPhase(long greenUntil) {
 		this.greenUntil = greenUntil;
+		DESScheduler.log(this.toString());
+	}
+
+	public void prepareGreenPhase(long greenUntil, Integer slowStartDelay) throws Exception {
+		if (slowStartDelay > greenUntil - DESScheduler.getSimulationTime())
+			throw new Exception("Deadlock -> Car can never leave because leaving time is higher than greentime: "
+					+ greenUntil + " < " + slowStartDelay);
+		this.prepareGreenPhase(greenUntil);
+
+		if (this.waitingVehicles.size() > 0) {
+			this.waitingVehicles.getFirst().leavingTime = slowStartDelay;
+		}
 	}
 
 	public void vehicleArriving(Vehicle vehicle) {
@@ -29,7 +41,7 @@ public class TrafficLight {
 
 	@ProcessStepDelay(0)
 	public long carLeavesDelay() {
-		return 0; 
+		return 0;
 	}
 
 	@ProcessStep(0)
@@ -38,7 +50,6 @@ public class TrafficLight {
 		if (timeleft > 0) {
 			try {
 				Vehicle next = this.waitingVehicles.getFirst();
-				// first car has enough time to leave
 				if (next.leavingTime <= timeleft) {
 					this.waitingVehicles.removeFirst();
 					DESScheduler.scheduleToFuture(new ModelProcess(this), next.leavingTime);
@@ -46,12 +57,12 @@ public class TrafficLight {
 			} catch (NoSuchElementException e) {
 				DESScheduler.scheduleToFuture(new ModelProcess(this), 1);
 			}
-		}
+		} else
+			DESScheduler.log(this.toString());
 	}
 
 	@Override
 	public String toString() {
-		return "Light = " + this.id + ", waiting cars = " + this.waitingVehicles.size() + ", green until = "
-				+ this.greenUntil;
+		return "Light = " + this.id + ", waiting cars = " + this.waitingVehicles.size();
 	}
 }
