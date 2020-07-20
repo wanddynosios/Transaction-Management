@@ -44,10 +44,10 @@ public class Crossing {
 		}
 		this.currentTrafficLight = this.trafficLights.get(this.currentLightId);
 
-		this.redLightStats = new EvaluationInterval("Red Light Phases", this, new MeanCharacteristic(),
+		this.redLightStats = new EvaluationInterval("Red Light Phases", new Object(), new MeanCharacteristic(),
 				new CountCharacteristic(), new StandardDeviationCharacteristic());
 
-		this.greenLightStats = new EvaluationInterval("Green Light Phases", this, new MeanCharacteristic(),
+		this.greenLightStats = new EvaluationInterval("Green Light Phases", new Object(), new MeanCharacteristic(),
 				new CountCharacteristic(), new StandardDeviationCharacteristic());
 	}
 
