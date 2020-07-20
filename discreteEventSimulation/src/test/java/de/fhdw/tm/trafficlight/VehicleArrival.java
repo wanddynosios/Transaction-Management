@@ -7,26 +7,26 @@ import de.fhdw.tm.des.modelling.ProcessStep;
 import de.fhdw.tm.des.modelling.ProcessStepDelay;
 import de.fhdw.tm.des.scheduler.DESScheduler;
 
-public class CarArrival {
+public class VehicleArrival {
 
 	private TrafficLight trafficLight;
 	private ExponentialDistribution distribution;
-	private Integer carLeavingTime;
+	private Integer leavingTime;
 
-	public CarArrival(TrafficLight trafficLight, Integer mean, Integer carLeavingTime) {
-		this.carLeavingTime = carLeavingTime;
+	public VehicleArrival(TrafficLight trafficLight, Integer mean, Integer leavingTime) {
+		this.leavingTime = leavingTime;
 		this.trafficLight = trafficLight;
 		this.distribution = new ExponentialDistribution(DESScheduler.getRandom(), mean);
 	}
 
 	@ProcessStepDelay(0)
-	public long nextCarDelay() {
+	public long nextDelay() {
 		return 0;
 	}
 
 	@ProcessStep(0)
-	public void nextCar() {
-		this.trafficLight.vehicleArriving(new Vehicle(this.carLeavingTime));
+	public void next() {
+		this.trafficLight.pushVehicle(new Vehicle(this.leavingTime));
 		DESScheduler.scheduleToFuture(new ModelProcess(this), (long) this.distribution.sample());
 	}
 }

@@ -12,15 +12,16 @@ public class TrafficLight {
 
 	private LinkedList<Vehicle> waitingVehicles;
 	private Integer id;
-	private long greenUntil;
+	private long greenUntil,timeleft;
 
-	public TrafficLight(long greenUntil, Integer id) {
+	public TrafficLight(Integer id) {
 		this.waitingVehicles = new LinkedList<Vehicle>();
 		this.id = id;
 	}
 
 	public void prepareGreenPhase(long greenUntil) {
 		this.greenUntil = greenUntil;
+		this.timeleft = this.greenUntil - DESScheduler.getSimulationTime();
 		DESScheduler.log(this.toString());
 	}
 
@@ -35,18 +36,18 @@ public class TrafficLight {
 		}
 	}
 
-	public void vehicleArriving(Vehicle vehicle) {
+	public void pushVehicle(Vehicle vehicle) {
 		this.waitingVehicles.addLast(vehicle);
 	}
 
 	@ProcessStepDelay(0)
-	public long carLeavesDelay() {
-		return 0;
+	public long popVehicleDelay() {
+		return 0; // doesnt get called -> see implementation modelling
 	}
 
 	@ProcessStep(0)
-	public void carLeaves() {
-		long timeleft = this.greenUntil - DESScheduler.getSimulationTime();
+	public void popVehicle() {
+		this.timeleft = this.greenUntil - DESScheduler.getSimulationTime();
 		if (timeleft > 0) {
 			try {
 				Vehicle next = this.waitingVehicles.getFirst();

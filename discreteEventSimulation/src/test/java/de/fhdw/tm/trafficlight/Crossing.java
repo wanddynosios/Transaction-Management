@@ -21,8 +21,8 @@ public class Crossing {
 	private Boolean slowStart;
 	private ExponentialDistribution slowStartDistribution;
 
-	public Crossing(Integer numberOfLights, Integer greenPhaseTime, Integer redPhaseTime, Integer carLeavingTime,
-			Integer slowStartMean, boolean slowStart) {
+	public Crossing(Integer numberOfLights, Integer greenPhaseTime, Integer redPhaseTime, Integer vehicleLeavingTime,
+			Integer vehicleArrivingMean, Integer slowStartMean, boolean slowStart) {
 		this.slowStartDistribution = new ExponentialDistribution(DESScheduler.getRandom(), slowStartMean);
 		this.slowStart = slowStart;
 		this.greenPhaseTime = greenPhaseTime;
@@ -31,17 +31,17 @@ public class Crossing {
 		this.numberOfLights = numberOfLights;
 		this.trafficLights = new HashMap<Integer, TrafficLight>();
 		for (int i = currentLightId; i < numberOfLights; i++) {
-			TrafficLight newLight = new TrafficLight(DESScheduler.getSimulationTime() + this.greenPhaseTime, i);
+			TrafficLight newLight = new TrafficLight(i);
 			this.trafficLights.put(i, newLight);
 			DESScheduler.scheduleToFuture(
-					new ModelProcess(new CarArrival(newLight, greenPhaseTime / carLeavingTime, carLeavingTime)), 0);
+					new ModelProcess(new VehicleArrival(newLight, vehicleArrivingMean, vehicleLeavingTime)), 0);
 		}
 		this.currentTrafficLight = this.trafficLights.get(this.currentLightId);
 	}
 
 	@ProcessStepDelay(0)
 	public long setUpDelay() {
-		return 0;
+		return 0; // doesnt get called -> see implementation modelling
 	}
 
 	@ProcessStep(0)
