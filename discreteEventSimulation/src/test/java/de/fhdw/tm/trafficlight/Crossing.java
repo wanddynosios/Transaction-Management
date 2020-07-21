@@ -40,18 +40,13 @@ public class Crossing {
 		this.numberOfLights = numberOfLights;
 		this.crashes = 0;
 		this.trafficLights = new HashMap<Integer, TrafficLight>();
-		for (int i = currentLightId; i < numberOfLights; i+=2) {
+		for (int i = currentLightId; i < numberOfLights; i++) {
 			TrafficLight newLight = new TrafficLight(i, this);
 			this.trafficLights.put(i, newLight);
 			DESScheduler.scheduleToFuture(
-					new ModelProcess(new VehicleArrival(newLight, vehicleArrivingMean, vehicleLeavingTime)), 0);
+					new ModelProcess(new VehicleArrival(newLight, vehicleArrivingMean + vehicleArrivingMean * (i % 2), vehicleLeavingTime)), 0);
 		}
-		for (int i = currentLightId + 1; i < numberOfLights; i+=2) {
-			TrafficLight newLight = new TrafficLight(i, this);
-			this.trafficLights.put(i, newLight);
-			DESScheduler.scheduleToFuture(
-					new ModelProcess(new VehicleArrival(newLight, vehicleArrivingMean * 2, vehicleLeavingTime)), 0);
-		}
+		
 
 		if (crashes)
 			DESScheduler.scheduleToFuture(new ModelProcess(new Crash(chrashMean, blockedMean, this)), 0);

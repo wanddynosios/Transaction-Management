@@ -16,7 +16,7 @@ public class CrossingSimulation {
 	@Test
 	public void simulate() {
 		try {
-			this.simulate(true, 0, 1, 1, 100000, 4, 20, 5, 2, 20 + 5 / 2, 15, false, 100000, 5000, false);
+			this.simulate(true, 0, 1, 1, 1000000, 4, 20, 5, 2, (20 + 5) / 2, 15, false, 100000, 5000, false);
 		} catch (InterruptedException e) {
 			fail(e.getCause());
 		}
