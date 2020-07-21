@@ -78,7 +78,7 @@ public class Crossing {
 	}
 
 	@ProcessStepDelay(1)
-	public long greenPhaseTime() {
+	public long greenPhase() {
 		this.greenLightStats.intervalStart();
 		if (slowStart)
 			this.currentTrafficLight.prepareGreenPhase(DESScheduler.getSimulationTime() + this.greenPhaseTime,
@@ -94,20 +94,20 @@ public class Crossing {
 	}
 
 	@ProcessStep(1)
-	public void greenPhase() {
+	public void greenPhaseEnd() {
 		this.printLight += " -> " + this.currentTrafficLight.print();
 		DESScheduler.log(this.printLight);
 		this.greenLightStats.intervalStop();
 	}
 
 	@ProcessStepDelay(2)
-	public long redPhaseTime() {
+	public long redPhase() {
 		this.redLightStats.intervalStart();
 		return this.redPhaseTime;
 	}
 
 	@ProcessStep(2)
-	public void redPhase() {
+	public void redPhaseEnd() {
 		this.redLightStats.intervalStop();
 		DESScheduler.scheduleToFuture(new ModelProcess(this), 0);
 	}
