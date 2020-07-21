@@ -26,7 +26,7 @@ public class Crossing {
 	private ExponentialDistribution slowStartDistribution;
 	private EvaluationInterval greenLightStats;
 	private EvaluationInterval redLightStats;
-	Integer crashes;
+	private Integer crashes;
 	private String printLight;
 
 	public Crossing(Integer numberOfLights, Integer greenPhaseTime, Integer redPhaseTime, Integer vehicleLeavingTime,
@@ -123,5 +123,9 @@ public class Crossing {
 
 	public void removeCrash() {
 		this.crashes--;
+	}
+	
+	public Integer getCrashes() {
+		return this.crashes;
 	}
 }

@@ -39,12 +39,12 @@ public class Crash {
 	}
 
 	@ProcessStepDelay(2)
-	public long blockCrossingTime() {
+	public long removeCrashDelay() {
 		return (long) this.block.sample();
 	}
 
 	@ProcessStep(2)
-	public void unblock() {
+	public void removeCrash() {
 		this.crossing.removeCrash();
 		DESScheduler.schedule(new ModelProcess(this), 0);
 	}
