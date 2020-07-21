@@ -26,7 +26,7 @@ public class VehicleArrival {
 
 	@ProcessStep(0)
 	public void next() {
-		this.trafficLight.pushVehicle(new Vehicle(this.leavingTime));
+		this.trafficLight.pushVehicle(new Vehicle(this.leavingTime, (int) DESScheduler.getSimulationTime()));
 		DESScheduler.scheduleToFuture(new ModelProcess(this), (long) this.distribution.sample());
 	}
 }

@@ -3,7 +3,6 @@ package de.fhdw.tm.trafficlight;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
-import de.fhdw.tm.des.evaluation.EvaluationInterval;
 import de.fhdw.tm.des.evaluation.SimulationEvaluatorWithStore;
 import de.fhdw.tm.des.evaluation.aggregation.CountCharacteristic;
 import de.fhdw.tm.des.evaluation.aggregation.MeanCharacteristic;
@@ -18,7 +17,7 @@ public class TrafficLight {
 	private LinkedList<Vehicle> waitingVehicles;
 	private Integer id;
 	private long greenUntil, timeleft;
-	private EvaluationInterval vehicleWaiting;
+	private SimulationEvaluatorWithStore vehicleWaiting;
 	private SimulationEvaluatorWithStore vehicleQueue;
 	private Crossing crossing;
 
@@ -27,12 +26,13 @@ public class TrafficLight {
 		this.id = id;
 		this.crossing = crossing;
 
-		this.vehicleWaiting = new EvaluationInterval("Vehicle waiting", this, new MeanCharacteristic(),
-				new CountCharacteristic(), new StandardDeviationCharacteristic());
-		this.vehicleWaiting.intervalStart();
-
-		this.vehicleQueue = new SimulationEvaluatorWithStore("Light " + this.id + " -> Vehicle queue", new Object(),
+		this.vehicleWaiting = new SimulationEvaluatorWithStore("Vehicle waiting", this,
 				new MeanCharacteristic(), new CountCharacteristic(), new StandardDeviationCharacteristic()) {
+		};
+
+		this.vehicleQueue = new SimulationEvaluatorWithStore("Light " + this.id + " -> Vehicle queue",
+				this.toString(), new MeanCharacteristic(), new CountCharacteristic(),
+				new StandardDeviationCharacteristic()) {
 		};
 	}
 
@@ -45,8 +45,8 @@ public class TrafficLight {
 	public void prepareGreenPhase(long greenUntil, Integer slowStartDelay) {
 		this.prepareGreenPhase(greenUntil);
 		if (this.waitingVehicles.size() > 0) {
-			this.waitingVehicles.getFirst().leavingTime = (int) Math.min(greenUntil - DESScheduler.getSimulationTime() - 1,
-					slowStartDelay);
+			this.waitingVehicles.getFirst().leavingTime = (int) Math
+					.min(greenUntil - DESScheduler.getSimulationTime() - 1, slowStartDelay);
 		}
 	}
 
@@ -70,8 +70,7 @@ public class TrafficLight {
 				Vehicle next = this.waitingVehicles.getFirst();
 				if (next.leavingTime <= timeleft) {
 					this.waitingVehicles.removeFirst();
-					this.vehicleWaiting.trigger();
-					// first vehicle leaving
+					this.vehicleWaiting.addData(DESScheduler.getSimulationTime() - next.arrivalTime);
 					DESScheduler.scheduleToFuture(new ModelProcess(this), next.leavingTime);
 				}
 			} catch (NoSuchElementException e) {
