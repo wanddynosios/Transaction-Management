@@ -26,13 +26,12 @@ public class TrafficLight {
 		this.id = id;
 		this.crossing = crossing;
 
-		this.vehicleWaiting = new SimulationEvaluatorWithStore("Vehicle waiting", this,
+		this.vehicleWaiting = new SimulationEvaluatorWithStore("", "Light " + this.id + " -> Vehicle waiting",
 				new MeanCharacteristic(), new CountCharacteristic(), new StandardDeviationCharacteristic()) {
 		};
 
-		this.vehicleQueue = new SimulationEvaluatorWithStore("Light " + this.id + " -> Vehicle queue",
-				this.toString(), new MeanCharacteristic(), new CountCharacteristic(),
-				new StandardDeviationCharacteristic()) {
+		this.vehicleQueue = new SimulationEvaluatorWithStore("", "Light " + this.id + " -> Vehicle queue",
+				new MeanCharacteristic(), new CountCharacteristic(), new StandardDeviationCharacteristic()) {
 		};
 	}
 
@@ -85,13 +84,9 @@ public class TrafficLight {
 		DESScheduler.scheduleToFuture(new ModelProcess(this), time);
 	}
 
-	public String print() {
-		return DESScheduler.getSimulationTime() + ": " + "Light = " + this.id + ", waiting cars = "
-				+ this.waitingVehicles.size();
-	}
-
 	@Override
 	public String toString() {
-		return this.id.toString();
+		return DESScheduler.getSimulationTime() + ": " + "Light = " + this.id + ", waiting cars = "
+				+ this.waitingVehicles.size();
 	}
 }

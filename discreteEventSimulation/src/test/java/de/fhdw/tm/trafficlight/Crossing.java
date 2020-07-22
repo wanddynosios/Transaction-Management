@@ -53,10 +53,10 @@ public class Crossing {
 
 		this.currentTrafficLight = this.trafficLights.get(this.currentLightId);
 
-		this.redLightStats = new EvaluationInterval("Red Light Phases", new Object(), new MeanCharacteristic(),
+		this.redLightStats = new EvaluationInterval("", "Crossing -> Red Light Phase", new MeanCharacteristic(),
 				new CountCharacteristic(), new StandardDeviationCharacteristic());
 
-		this.greenLightStats = new EvaluationInterval("Green Light Phases", new Object(), new MeanCharacteristic(),
+		this.greenLightStats = new EvaluationInterval("", "Crossing -> Green Light Phase", new MeanCharacteristic(),
 				new CountCharacteristic(), new StandardDeviationCharacteristic());
 	}
 
@@ -81,7 +81,7 @@ public class Crossing {
 		else
 			this.currentTrafficLight.prepareGreenPhase(DESScheduler.getSimulationTime() + this.greenPhaseTime);
 
-		this.printLight = this.currentTrafficLight.print();
+		this.printLight = this.currentTrafficLight.toString();
 
 		DESScheduler.scheduleToFuture(new ModelProcess(this.currentTrafficLight), 0);
 
@@ -90,7 +90,7 @@ public class Crossing {
 
 	@ProcessStep(1)
 	public void greenPhaseEnd() {
-		this.printLight += " -> " + this.currentTrafficLight.print();
+		this.printLight += " -> " + this.currentTrafficLight.toString();
 		DESScheduler.log(this.printLight);
 		this.greenLightStats.intervalStop();
 	}
